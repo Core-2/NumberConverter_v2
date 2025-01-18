@@ -1,154 +1,76 @@
-#include <algorithm>
-#include <array>
-#include <cassert>
 #include <iostream>
-#include <string_view>
-#include <vector>
 #include <Windows.h>
 
-constexpr int max_number{1000000000};   // a number, before which numbers can be converted
+constexpr int MAX_NUMBER{1000000000};   // a number, before which numbers can be converted
 constexpr int power_of_ten{3};
+constexpr int number_ten{10};
 
-static std::array<std::string_view, 10> units{"\b", "один", "два", "три", "четыре", "пять",
-                                              "шесть", "семь", "восемь", "девять"};
+const char* units[] {"\b", "один", "два", "три", "четыре", "пять",
+    "шесть", "семь", "восемь", "девять"};
 
-static std::array<std::string_view, 10> units_alt{"\b", "одна", "две", "три", "четыре", "пять",
-                                              "шесть", "семь", "восемь", "девять"};
+const char* units_alt[]{"\b", "одна", "две", "три", "четыре", "пять",
+    "шесть", "семь", "восемь", "девять"};
 
-static std::array<std::string_view, 10> teens{"десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
-                                               "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"};
+const char* teens[]{"десять", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать",
+    "пятнадцать", "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать"};
 
-static std::array<std::string_view, 10> tens{"\b", "\b", "двадцать", "тридцать", "сорок", "пятьдесят",
-                                              "шестьдесят", "семьдесят", "восемьдесят", "девяносто"};
+const char* tens[]{"\b", "\b", "двадцать", "тридцать", "сорок", "пятьдесят",
+    "шестьдесят", "семьдесят", "восемьдесят", "девяносто"};
 
-static std::array<std::string_view, 10> hundreds{"\b", "сто", "двести", "триста", "четыреста", "пятьсот",
-                                                 "шестьсот", "семьсот", "восемьсот", "девятьсот"};
+const char* hundreds[]{"\b", "сто", "двести", "триста", "четыреста", "пятьсот",
+    "шестьсот", "семьсот", "восемьсот", "девятьсот"};
 
-const std::string_view thousand_default{"тысяч"};
-const std::string_view thousand_var1{"тысяча"};
-const std::string_view thousand_var2{"тысячи"};
+const char* thousand_default{"тысяч"};
+const char* thousand_var1{"тысяча"};
+const char* thousand_var2{"тысячи"};
 
-const std::string_view million_default{"миллионов"};
-const std::string_view million_var1{"миллион"};
-const std::string_view million_var2{"миллиона"};
+const char* million_default{"миллионов"};
+const char* million_var1{"миллион"};
+const char* million_var2{"миллиона"};
 
-static std::array<std::string_view, 10> thousands{thousand_default, thousand_var1, thousand_var2,
-                                             thousand_var2, thousand_var2, thousand_default,
-                                             thousand_default, thousand_default, thousand_default,
-                                             thousand_default};
+const char* thousands[]{thousand_default, thousand_var1, thousand_var2,
+    thousand_var2, thousand_var2, thousand_default,
+    thousand_default, thousand_default, thousand_default,
+    thousand_default};
 
-static std::array<std::string_view, 10> millions{million_default, million_var1, million_var2,
-                                             million_var2, million_var2, million_default,
-                                             million_default, million_default, million_default,
-                                             million_default};
-
-
-int getInput() {
-    int value{};
-
-    do {
-        std::cout << "Введите корректное число: ";
-        std::cin >> value;
-    }
-    while (value < 0 || value >= max_number);
-
-    return value;
-}
+const char* millions[]{million_default, million_var1, million_var2,
+    million_var2, million_var2, million_default,
+    million_default, million_default, million_default,
+    million_default};
 
 
-void separateInputOnNumbers(int i, std::vector<int>& vec) {
-    vec.push_back(i % 10);
-    int temp{i / 10};
+int getNumberLength(int number)
+{
+    int length{0};
 
-    if(!temp) return;
-
-    separateInputOnNumbers(temp, vec);
-}
-
-
-void printWord(std::array<std::string_view, 10>& arr, int unitIndex) {
-    std::cout << arr[unitIndex] << ' ';
-}
-
-
-bool selectAndPrintNumberName(int index, int rest, int blocksOfHundreds, bool isTeen) {
-    std::array<std::string_view, 10>* arr;
-
-    switch(rest) {
-    case 3:
-        arr = &hundreds;
-        break;
-
-    case 2:
-        isTeen = (index == 1);
-        arr = &tens;
-        break;
-
-    case 1:
-        if(isTeen)
-            arr = &teens;
-        else if (blocksOfHundreds == 1)
-            arr = &units_alt;
-        else
-            arr = &units;
-        break;
-
-    default:
-        return isTeen;
+    for(; number != 0; number /= 10)
+    {
+        ++length;
     }
 
-    printWord(*arr, index);
-    return isTeen;
+    return length;
 }
 
 
-bool selectAndPrintLargeNumberName(int index, int blocksOfHundreds, bool isTeen) {
-    std::array<std::string_view, 10>* arr;
+int getInput()
+{
+    int input{0};
+    std::cout << "Введите положительное число: ";
+    std::cin >> input;
 
-    switch(blocksOfHundreds) {
-    case 1:
-        arr = &thousands;
-        break;
-    case 2:
-        arr = &millions;
-        break;
-    default:
-        return isTeen;
-    }
-
-    if(isTeen) {
-        index = 0;
-        isTeen = false;
-    }
-
-    printWord(*arr, index);
-    return isTeen;
+    return input;
 }
 
 
-void printNumberInWords(const std::vector<int>& vec) {
-    int blocksOfHundreds{static_cast<int>(vec.size()) / power_of_ten};
-    int rest{static_cast<int>(vec.size()) % power_of_ten};
-    bool isBlockOfHundredsIsEmpty{false};
-    bool isTeen{false};
+void numberToArray(int* &arr, int num)
+{
+    int length{getNumberLength(num)};
+    arr = new int[static_cast<std::size_t>(length)]{};
 
-    for(auto num : vec) {
-        if(rest == 0) {
-            --blocksOfHundreds;
-            rest = 3;
-            isBlockOfHundredsIsEmpty = true;
-        }
-
-        isTeen = selectAndPrintNumberName(num, rest, blocksOfHundreds, isTeen);
-
-        if(num)
-            isBlockOfHundredsIsEmpty = false;
-
-        --rest;
-
-        if(rest == 0 && !isBlockOfHundredsIsEmpty) {
-            isTeen = selectAndPrintLargeNumberName(num, blocksOfHundreds, isTeen);
-        }
+    for(int i{length - 1}; i >= 0; --i)
+    {
+        *(arr + i) = num % 10;
+        num /= 10;
     }
 }
 
@@ -159,15 +81,24 @@ int main()
     SetConsoleOutputCP(CP_UTF8);
 
     int input{getInput()};
+    int numberLength{getNumberLength(input)};
+    int* numArr{nullptr};
 
-    std::vector<int> inputNumbers{};
+    numberToArray(numArr, input);
 
-    separateInputOnNumbers(input, inputNumbers);
-    std::reverse(inputNumbers.begin(), inputNumbers.end());
+//    for(int i{numberLength - 1}; i >= 0; --i)
+//    {
+//        *(numArr + i) = input % 10;
+//        input /= 10;
+//    }
 
-    printNumberInWords(inputNumbers);
+    for(int i{0}; i < numberLength; ++i)
+    {
+        std::cout << *(numArr + i) << ' ';
+    }
 
     std::cout << '\n';
 
+    delete[] numArr;
     return 0;
 }
