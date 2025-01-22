@@ -304,7 +304,7 @@ bool checkNteen(int digit, int position)
 
 bool checkLargeNumberIsZero(int digit, int numIndex, bool check)
 {
-    if(numIndex == 0)
+    if(numIndex == index_ruble)
         return false;
     else if(check)
         return (digit == 0);
