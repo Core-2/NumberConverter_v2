@@ -61,14 +61,16 @@ const char* rubles[]{ruble_default, ruble_var1, ruble_var2,
 
 void ignoreLine();
 void printConvertedNumber(int);
+void convertAndPrintDigit(int, int, int, bool);
+void convertAndPrintLargeNumber(int, int, bool, bool);
 bool checkLargeNumberIsZero(int, int, bool);
 bool checkNteen(int, int);
 bool checkNumberInBounds(int);
 bool getContinueOrExit();
 int getNumber();
 int getNumberLength(int);
-int* numberToArray(int, int);
-const char* convertNumberToWord(int, int, int, bool);
+int getDigitFromNumber(int, int);
+const char* convertDigitToWord(int, int, int, bool);
 const char* convertLargeNumberToWord(int, int, bool);
 const char* getUnitWord(int, int, bool);
 
@@ -112,7 +114,7 @@ int getNumber()
         else if(!checkNumberInBounds(num))
         {
             ignoreLine();
-            std::cout << "Введеное число за допустимыми границами! "
+            std::cout << "Введенное число за допустимыми границами! "
                          "Попробуйте снова.\n";
         }
         else
@@ -126,12 +128,7 @@ int getNumber()
 
 bool checkNumberInBounds(int num)
 {
-    if(num < 0)
-        return false;
-    else
-        return num < max_number;
-
-    //return((num >= 0) && (num < max_number));
+    return num < 0 ? false : num < max_number;
 }
 
 
@@ -165,39 +162,25 @@ void printConvertedNumber(int num)
     }
 
     int numberLength{getNumberLength(num)};
-    int* numArr{numberToArray(num, numberLength)};
     bool isNteen{false};
     bool isLargeNumberZero{true};
 
     for(int numIndex{numberLength - 1}; numIndex >= 0; --numIndex)
     {
-        int digit{numArr[numIndex]};
+        int digit{getDigitFromNumber(num, numIndex)};
         int position{numIndex % position_calc};
 
-        const char * word{convertNumberToWord(digit, numIndex, position, isNteen)};
-
-        if(isNteen)
-            std::cout << backspace_str;
-
-        std::cout << word << ' ';
-
+        convertAndPrintDigit(digit, numIndex, position, isNteen);
         isLargeNumberZero = checkLargeNumberIsZero(digit, numIndex, isLargeNumberZero);
 
         if(position == pos_unit)
         {
-            word = isLargeNumberZero ?
-                        backspace_str :
-                        convertLargeNumberToWord(digit, numIndex, isNteen);
-
-            std::cout << word << ' ';
-
+            convertAndPrintLargeNumber(digit, numIndex, isNteen, isLargeNumberZero);
             isLargeNumberZero = true;
         }
 
         isNteen = checkNteen(digit, position);
     }
-
-    delete[] numArr;
 }
 
 
@@ -215,21 +198,39 @@ int getNumberLength(int number)
 }
 
 
-int* numberToArray(int num, int length)
+int getDigitFromNumber(int num, int i)
 {
-    int* arr{new int[static_cast<std::size_t>(length)]{}};
-
-    for(int i{0}; i < length; ++i)
+    int pos{1};
+    while( i != 0)
     {
-        arr[i] = num % number_ten;
-        num /= number_ten;
+        pos *= number_ten;
+        --i;
     }
 
-    return arr;
+    return ((num / pos) % number_ten);
 }
 
 
-const char* convertNumberToWord(int digit, int numIndex, int position, bool isNteen)
+void convertAndPrintDigit(int digit, int numIndex, int position, bool isNteen) {
+    const char* word{convertDigitToWord(digit, numIndex, position, isNteen)};
+
+    if(isNteen)
+        std::cout << backspace_str;
+
+    std::cout << word << ' ';
+}
+
+
+void convertAndPrintLargeNumber(int digit, int numIndex, bool isNteen, bool isLargeNumberZero) {
+    const char* word = isLargeNumberZero ?
+                backspace_str :
+                convertLargeNumberToWord(digit, numIndex, isNteen);
+
+    std::cout << word << ' ';
+}
+
+
+const char* convertDigitToWord(int digit, int numIndex, int position, bool isNteen)
 {
     const char* result;
 
@@ -293,23 +294,17 @@ const char* convertLargeNumberToWord(int digit, int numIndex, bool isNteen)
 
 bool checkNteen(int digit, int position)
 {
-    if(position == pos_ten)
-        return digit == 1;
-    else
-        return false;
-
-    //return ((position == pos_ten) && (digit == 1));
+    return (position == pos_ten) ? digit == 1 : false;
 }
 
 
 bool checkLargeNumberIsZero(int digit, int numIndex, bool check)
 {
+    bool result{false};
     if(numIndex == index_ruble)
-        return false;
+        result = false;
     else if(check)
-        return (digit == 0);
-    else
-        return false;
+        result = (digit == 0);
 
-    //return check && (digit == 0);
+    return result;
 }
