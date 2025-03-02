@@ -61,8 +61,9 @@ const char* rubles[]{ruble_default, ruble_var1, ruble_var2,
 
 void ignoreLine();
 void printConvertedNumber(int);
+void convertationCycle(int, int, bool&, bool&);
 void convertAndPrintDigit(int, int, int, bool);
-void convertAndPrintLargeNumber(int, int, bool, bool);
+void convertAndPrintLargeNumberName(int, int, bool, bool);
 bool checkLargeNumberIsZero(int, int, bool);
 bool checkNteen(int, int);
 bool checkNumberInBounds(int);
@@ -87,12 +88,6 @@ int main()
         std::cout << '\n';
     }
     while(getContinueOrExit());
-
-//    for(int i{1000}; i < 100000; i += 75)
-//    {
-//        printConvertedNumber(i);
-//        std::cout << '\n';
-//    }
     return 0;
 }
 
@@ -167,20 +162,26 @@ void printConvertedNumber(int num)
 
     for(int numIndex{numberLength - 1}; numIndex >= 0; --numIndex)
     {
-        int digit{getDigitFromNumber(num, numIndex)};
-        int position{numIndex % position_calc};
-
-        convertAndPrintDigit(digit, numIndex, position, isNteen);
-        isLargeNumberZero = checkLargeNumberIsZero(digit, numIndex, isLargeNumberZero);
-
-        if(position == pos_unit)
-        {
-            convertAndPrintLargeNumber(digit, numIndex, isNteen, isLargeNumberZero);
-            isLargeNumberZero = true;
-        }
-
-        isNteen = checkNteen(digit, position);
+        convertationCycle(num, numIndex, isNteen, isLargeNumberZero);
     }
+}
+
+
+void convertationCycle(int num, int numIndex, bool& isNteen, bool& isLargeNumberZero)
+{
+    int digit{getDigitFromNumber(num, numIndex)};
+    int position{numIndex % position_calc};
+
+    convertAndPrintDigit(digit, numIndex, position, isNteen);
+    isLargeNumberZero = checkLargeNumberIsZero(digit, numIndex, isLargeNumberZero);
+
+    if(position == pos_unit)
+    {
+        convertAndPrintLargeNumberName(digit, numIndex, isNteen, isLargeNumberZero);
+        isLargeNumberZero = true;
+    }
+
+    isNteen = checkNteen(digit, position);
 }
 
 
@@ -221,7 +222,7 @@ void convertAndPrintDigit(int digit, int numIndex, int position, bool isNteen) {
 }
 
 
-void convertAndPrintLargeNumber(int digit, int numIndex, bool isNteen, bool isLargeNumberZero) {
+void convertAndPrintLargeNumberName(int digit, int numIndex, bool isNteen, bool isLargeNumberZero) {
     const char* word = isLargeNumberZero ?
                 backspace_str :
                 convertLargeNumberToWord(digit, numIndex, isNteen);
