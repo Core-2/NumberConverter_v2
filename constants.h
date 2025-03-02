@@ -1,13 +1,13 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-constexpr int max_number{1000000000};
-constexpr int position_calc{3};
-constexpr int number_ten{10};
+inline constexpr int max_number{1000000000};
+inline constexpr int position_calc{3};
+inline constexpr int number_ten{10};
 
-constexpr int pos_unit{0};
-constexpr int pos_ten{1};
-constexpr int pos_hundred{2};
+inline constexpr int pos_unit{0};
+inline constexpr int pos_ten{1};
+inline constexpr int pos_hundred{2};
 
 const char* backspace_str{"\b"};
 const char* unit_zero{"ноль"};
@@ -30,17 +30,17 @@ const char* hundreds[]{backspace_str, "сто", "двести", "триста", 
 const char* thousand_default{"тысяч"};
 const char* thousand_var1{"тысяча"};
 const char* thousand_var2{"тысячи"};
-constexpr int index_thousand{3};
+inline constexpr int index_thousand{3};
 
 const char* million_default{"миллионов"};
 const char* million_var1{"миллион"};
 const char* million_var2{"миллиона"};
-constexpr int index_million{6};
+inline constexpr int index_million{6};
 
 const char* ruble_default{"рублей"};
 const char* ruble_var1{"рубль"};
 const char* ruble_var2{"рубля"};
-constexpr int index_ruble{0};
+inline constexpr int index_ruble{0};
 
 const char* thousands[]{thousand_default, thousand_var1, thousand_var2,
     thousand_var2, thousand_var2, thousand_default,
